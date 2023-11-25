@@ -2,9 +2,26 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { useOnMountUnsafe } from './useOnUnsafeMount'
 
 function App() {
   const [count, setCount] = useState(0)
+
+  
+  let interval: number;
+
+  useOnMountUnsafe(() => {
+    console.log('Called useEffect - starting timer', Date.now(), count)
+    interval = setInterval( ()=> {
+      setCount( (value) => value+1);      
+    }, 5000);
+  }, [count], () => {
+    console.log('Cleanup method has been called');
+    clearInterval(interval);
+   });
+
+
+  console.log('Render the count is: ', count);
 
   return (
     <>

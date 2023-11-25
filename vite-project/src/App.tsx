@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -6,6 +6,7 @@ import { useOnMountUnsafe } from './useOnUnsafeMount'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [change, setChange] = useState(0);
 
   
   let interval: number;
@@ -14,12 +15,21 @@ function App() {
     console.log('Called useEffect - starting timer', Date.now(), count)
     interval = setInterval( ()=> {
       setCount( (value) => value+1);      
-    }, 5000);
+
+      // Every 10 call, affect the memo
+      if ( (count+1) % 10 == 0) {
+        setChange(count+1);
+      }
+    }, 1000);
   }, [count], () => {
     console.log('Cleanup method has been called');
     clearInterval(interval);
    });
 
+   const myMemo = useMemo( () => {
+    console.log('Change happened', count);
+    return change;
+   }, [change]);
 
   console.log('Render the count is: ', count);
 
@@ -39,6 +49,10 @@ function App() {
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
+        <button onClick={() => { console.log('MyMemo is:', myMemo); setChange(999); }}>
+          Click me {myMemo}
+        </button>
+
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
